@@ -1,42 +1,40 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-const Register = () => {
-  const [name, setName] = useState("");
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<{ [key: string]: string }>({});
+  const [message, setMessage] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.post("http://localhost:4200/api/register", {
-        name,
+      const res = await axios.post("http://localhost:4200/api/login", {
         email,
         password,
-        confirmPassword,
       });
+      console.log(res);
       setData(res.data);
       setIsLoading(false);
     } catch (errors: any) {
       setErrors(errors.response?.data.errors);
-      console.log(errors.response.data.errors);
+      setMessage(errors.response?.data.message);
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (data.message === "User has been created") {
-      router.push("/sign-in");
+    if (data.message === "Login successful") {
+      router.push("/");
     }
   }, [data, router]);
 
@@ -46,27 +44,13 @@ const Register = () => {
         <div className="max-w-[350px] w-full space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Sign Up
+              Sign In
             </h2>
           </div>
+          {message && <div className="text-center text-red-500">{message}</div>}
           <form className="mt-8 space-y-3" action="#" method="POST">
             <input type="hidden" name="remember" value="true" />
 
-            <div>
-              <label htmlFor="name" className="sr-only">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="w-full rounded-md px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            {errors && <div className="text-red-500 py-0">{errors.name}</div>}
             <div>
               <label htmlFor="email-address" className="sr-only">
                 Email address
@@ -101,44 +85,26 @@ const Register = () => {
             {errors && (
               <div className="text-red-500 py-0">{errors.password}</div>
             )}
-            <div>
-              <label htmlFor="confirm-password" className="sr-only">
-                Confirm Password
-              </label>
-              <input
-                id="confirm-password"
-                name="confirm-password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="rounded-md w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm Password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            {errors && (
-              <div className="text-red-500 py-0">{errors.confirmPassword}</div>
-            )}
 
             <div>
               <button
                 type="submit"
                 onClick={handleSubmit}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 disabled={isLoading}
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                {isLoading && <Loader2 className="w-3 mr-2 animate-spin" />}
-                Sign Up
+                {isLoading && <Loader2 className="w-4 mr-2 animate-spin" />}
+                Sign In
               </button>
             </div>
           </form>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{" "}
+            Don’t have an account yet?{" "}
             <Link
-              href="/sign-in"
+              href="/sign-up"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Login
+              Register
             </Link>
           </p>
         </div>
@@ -146,4 +112,4 @@ const Register = () => {
     </>
   );
 };
-export default Register;
+export default Login;
